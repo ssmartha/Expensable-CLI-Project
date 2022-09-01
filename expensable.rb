@@ -1,4 +1,5 @@
 # Start here. Happy coding!
+# Start here. Happy coding!
 require "httparty"
 require "json"
 require "terminal-table"
@@ -42,18 +43,6 @@ class ExpensableApp
   def login_menu(options)
     get_with_options(options)
   end
-
-  # def get_with_options(options)
-  #   action = ""
-  #   loop do
-  #     print "> "
-  #     action=gets.chomp
-  #     break if options.include?(action)
-  
-  #     puts "Invalid option"
-  #   end
-  #   action
-  # end
 
   def login
     credentials = credentials_form
@@ -104,18 +93,6 @@ class ExpensableApp
     get_with_options(options)
   end
 
-  # def get_with_options(options)
-  #   action = ""
-  #   loop do
-  #     print "> "
-  #     action=gets.chomp
-  #     break if options.include?(action)
-  
-  #     puts "Invalid option"
-  #   end
-  #   action
-  # end
-
   def get_with_options(options)
     action = ""
     id = nil
@@ -153,7 +130,7 @@ class ExpensableApp
         when "show" then puts "show "#update_note(id)
         when "update" then puts "update category"#delete_note(id)
         when "delete" then puts "delete category"#toggle_note(id)
-        when "add-to" then puts "add-to category"#trash_page
+        when "add-to" then add_to(id)  #@categories#"#{@categories[:id]}" #trash_page
         when "toggle" then puts "toggle category"#create_note
         when "next" then puts "next category"#update_note(id)
         when "logout" then puts "logout category"#delete_note(id)
@@ -165,16 +142,37 @@ class ExpensableApp
       # end
     end
   end
-#   create | show ID | update ID | delete ID
-# add-to ID | toggle | next | prev | logout
+
+  def add_to(id)
+  category_selected=get_category_data(id)
+  p category_selected
+  transactions_data=category_selected[:transactions]
+  p transactions_data
+  transactions_data.push(new_transaction)
+  p transactions_data
+  end
+
+  def new_transaction
+    amount = get_string("Amount")
+    date = get_string("Date")
+    notes = get_string("Notes")
+    { id: 516, amount: amount, date: "2021-11-30", notes: notes}
+  end
+
+  def get_category_data(id)
+    @categories.find {|category| category[:id]==id}
+  end
 
   def categories_table
     table = Terminal::Table.new
-    table.title = "Expenses\nDecember 2021"
+    # transaction_type=["income","expense"]
+    # current_transaction=transaction_type[0]==(@categories[0][:transaction_type]) ? transaction_type[0] : transaction_type[1]
+    
+    table.title = "#{@categories[0][:transaction_type].capitalize}\nDecember 2021"
     table.headings = ["ID", "Category", "Total"]
     # table.rows = @categories
     table.rows = @categories.map do |category|
-      [category[:id], category[:color], category[:icon]]
+      [category[:id], category[:name], category[:icon]]
     end
     table
   end
