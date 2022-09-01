@@ -133,8 +133,10 @@ class ExpensableApp
         when "add-to" then add_to(id)  #@categories#"#{@categories[:id]}" #trash_page
         when "toggle" then puts "toggle category"#create_note
         when "next" then puts "next category"#update_note(id)
-        when "logout" then puts "logout category"#delete_note(id)
-        # when "exit" then puts "Thanks for using Keepable CLI"
+        when "logout" 
+          puts welcome_message
+          options=["login", "create_user", "exit"]
+          puts options.join(" | ")
         end
       # rescue HTTParty::ResponseError => error
       #   parsed_error = JSON.parse(error.message, symbolize_names: true)
@@ -142,6 +144,13 @@ class ExpensableApp
       # end
     end
   end
+
+  # def start_welcome
+  #   welcome_message
+  #   options=["login", "create_user", "exit"]
+  #   puts options.join(" | ")
+  #   # break
+  # end
 
   def add_to(id)
   category_selected=get_category_data(id)
