@@ -19,7 +19,9 @@ class ExpensableApp
     options=["login", "create_user", "exit"]
     puts options.join(" | ")
     until action == "exit"
+
         action = login_menu(options)[0]
+
         case action
         when "login" then login
         when "create_user" then create_user
@@ -107,13 +109,24 @@ class ExpensableApp
     get_with_options(options)
   end
 
+  # def get_with_options(options)
+  #   action = ""
+  #   loop do
+  #     print "> "
+  #     action=gets.chomp
+  #     break if options.include?(action)
+  
+  #     puts "Invalid option"
+  #   end
+  #   action
+  # end
+
   def get_with_options(options)
     action = ""
     id = nil
     options2=[]
     options.each do |option|
       options2<<option.split[0]
-
     end
     loop do
       print "> " 
@@ -121,6 +134,7 @@ class ExpensableApp
       break if options2.include?(action)
       puts "Invalid option"
     end
+
     [action, id.to_i]
   end
 
@@ -135,10 +149,7 @@ class ExpensableApp
         options=["create", "show ID", "update ID", "delete ID", "add-to ID", "toggle", "next","prev", "logout"]
         puts options.join(" | ")
         action, id = categories_menu(options)
-
-    
-        # p action 
-        # p id
+        
         case action
         when "create" then puts "create #{id}"#create_note
         when "show" then puts "show "#update_note(id)
@@ -146,7 +157,7 @@ class ExpensableApp
         when "delete" then puts "delete category"#toggle_note(id)
         when "add-to" then puts "add-to category"#trash_page
         when "toggle" then toggle_category
-        when "next" then   next_category #update_note(id)
+        when "next" then  next_category 
         when "prev" then prev_category
         when "logout" then puts #logout #delete_note(id)
         # when "exit" then puts "Thanks for using Keepable CLI"
