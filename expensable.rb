@@ -16,7 +16,7 @@ class ExpensableApp
     options=["login", "create_user", "exit"]
     puts options.join(" | ")
     until action == "exit"
-        action=login_menu(options)
+        action=login_menu(options)[0]
         case action
         when "login" then login
         when "create_user" then create_user
@@ -40,8 +40,7 @@ class ExpensableApp
   end
 
   def login_menu(options)
-    action = get_with_options(options)
-    action
+    get_with_options(options)
   end
 
   # def get_with_options(options)
@@ -105,16 +104,36 @@ class ExpensableApp
     get_with_options(options)
   end
 
+  # def get_with_options(options)
+  #   action = ""
+  #   loop do
+  #     print "> "
+  #     action=gets.chomp
+  #     break if options.include?(action)
+  
+  #     puts "Invalid option"
+  #   end
+  #   action
+  # end
+
   def get_with_options(options)
     action = ""
+    id = nil
     loop do
+      # puts options.join(" | ")
       print "> "
-      action=gets.chomp
+      action, id = gets.chomp.split(" ")
+      # action ||= ""
+      # Hacer el request!
       break if options.include?(action)
   
       puts "Invalid option"
     end
-    action
+  
+    # action.empty? && default ? [default, id] : [action, id.to_i]
+    # action.empty? && default ? [default, id] : [action, id.to_i]
+    #  true           nil
+    [action, id.to_i]
   end
 
   def categories_page
@@ -126,7 +145,7 @@ class ExpensableApp
         puts categories_table
         options=["create", "show", "update", "delete", "add-to", "toggle", "next", "logout"]
         puts options.join(" | ")
-        action, id = categories_menu(options).split(" ")
+        action, id = categories_menu(options)
         # p action 
         # p id
         case action
