@@ -8,6 +8,9 @@ require_relative "services/sessions"
 class ExpensableApp
   def initialize
     @user = nil
+    @type = "expense"  
+    # @today = DateTime.now() 
+    @today = DateTime.parse("2021-09-15")
   end
 
    def start
@@ -16,7 +19,9 @@ class ExpensableApp
     options=["login", "create_user", "exit"]
     puts options.join(" | ")
     until action == "exit"
-        action=login_menu(options)[0]
+
+        action = login_menu(options)[0]
+
         case action
         when "login" then login
         when "create_user" then create_user
@@ -119,20 +124,17 @@ class ExpensableApp
   def get_with_options(options)
     action = ""
     id = nil
+    options2=[]
+    options.each do |option|
+      options2<<option.split[0]
+    end
     loop do
-      # puts options.join(" | ")
-      print "> "
-      action, id = gets.chomp.split(" ")
-      # action ||= ""
-      # Hacer el request!
-      break if options.include?(action)
-  
+      print "> " 
+      action, id =gets.chomp.split (" ")
+      break if options2.include?(action)
       puts "Invalid option"
     end
-  
-    # action.empty? && default ? [default, id] : [action, id.to_i]
-    # action.empty? && default ? [default, id] : [action, id.to_i]
-    #  true           nil
+
     [action, id.to_i]
   end
 
@@ -141,22 +143,23 @@ class ExpensableApp
 
     action = ""
     until action == "logout"
+       get_month
       # begin
         puts categories_table
-        options=["create", "show", "update", "delete", "add-to", "toggle", "next", "logout"]
+        options=["create", "show ID", "update ID", "delete ID", "add-to ID", "toggle", "next","prev", "logout"]
         puts options.join(" | ")
         action, id = categories_menu(options)
-        # p action 
-        # p id
+        
         case action
         when "create" then puts "create #{id}"#create_note
         when "show" then puts "show "#update_note(id)
         when "update" then puts "update category"#delete_note(id)
         when "delete" then puts "delete category"#toggle_note(id)
         when "add-to" then puts "add-to category"#trash_page
-        when "toggle" then puts "toggle category"#create_note
-        when "next" then puts "next category"#update_note(id)
-        when "logout" then puts "logout category"#delete_note(id)
+        when "toggle" then toggle_category
+        when "next" then  next_category 
+        when "prev" then prev_category
+        when "logout" then puts #logout #delete_note(id)
         # when "exit" then puts "Thanks for using Keepable CLI"
         end
       # rescue HTTParty::ResponseError => error
@@ -165,20 +168,61 @@ class ExpensableApp
       # end
     end
   end
-#   create | show ID | update ID | delete ID
-# add-to ID | toggle | next | prev | logout
+
 
   def categories_table
     table = Terminal::Table.new
-    table.title = "Expenses\nDecember 2021"
+    table.title = "#{@type.capitalize}\n #{@today.strftime("%B %Y")}" #format fecha mm-yyyy
     table.headings = ["ID", "Category", "Total"]
     # table.rows = @categories
-    table.rows = @categories.map do |category|
-      [category[:id], category[:color], category[:icon]]
+
+    dates_category=@categories.select {|category| category [:transaction_type] == @type }
+    table.rows = dates_category.map do |category|
+        total_amount = 0
+        category[:resum].each do |transaction|
+          total_amount += transaction[:amount]
+        end
+      [category[:id], category[:name],total_amount]
     end
     table
   end
 
+  def toggle_category
+    @type =  @type == "expense" ? "income" : "expense"
+
+  end
+
+  def get_month
+
+    @categories = @categories.map! do |category| #categories actualizado
+
+      month=[]
+      # category.merge!(day:"aaaa")
+      category[:transactions].each do |transaction|
+       date = DateTime.parse(transaction[:date])  #se convierte en fecha 
+       init_month = DateTime.new(@today.strftime("%Y").to_i,@today.strftime("%-m").to_i) #primer dia del mes 
+       final_month = DateTime.new(@today.next_month.strftime("%Y").to_i,@today.next_month.strftime("%-m").to_i)-1 #ultimo dia de mes 
+
+       if date < final_month && date > init_month
+        month<<transaction
+       end
+
+       
+      end
+      category.merge(resum:month) #agrega un key adicional "Resum: " y value:mount[] en transactions que almacena el mes completo 
+
+    end
+    @categories
+  end
+
+
+  def next_category
+    @today = @today.next_month
+  end
+
+  def prev_category
+    @today = @today.prev_month
+  end
 end
 
 app=ExpensableApp.new
