@@ -115,6 +115,7 @@ class ExpensableApp
 
   def categories_page
     @categories = Services::Sessions.index(@user[:token])
+    p @categories
 
     action = ""
     until action == "logout"
@@ -145,23 +146,16 @@ class ExpensableApp
     end
   end
 
-  # def start_welcome
-  #   welcome_message
-  #   options=["login", "create_user", "exit"]
-  #   puts options.join(" | ")
-  #   # break
-  # end
-
   def add_to(id)
+  transaction_data=transaction_form
+  new_transaction=Services::Sessions.addto(@user[:token],id,transaction_data)
+
   category_selected=get_category_data(id)
-  p category_selected
   transactions_data=category_selected[:transactions]
-  p transactions_data
   transactions_data.push(new_transaction)
-  p transactions_data
   end
 
-  def new_transaction
+  def transaction_form
     amount = get_string("Amount")
     date = get_string("Date")
     notes = get_string("Notes")
