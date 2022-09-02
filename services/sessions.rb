@@ -48,7 +48,7 @@ module Services
         }
       }
       response = post("/categories/#{id}/transactions", options)
-      p response
+      # p response
       # HTTParty::ResponseError
       raise ResponseError.new(response) unless response.success?
       JSON.parse(response.body, symbolize_names: true)
