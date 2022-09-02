@@ -1,5 +1,7 @@
 require "httparty"
 require "json"
+require "date"
+
 module Services
   class Sessions
     include HTTParty
@@ -65,3 +67,6 @@ module Services
 
   end
 end
+
+
+

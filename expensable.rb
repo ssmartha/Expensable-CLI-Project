@@ -16,7 +16,9 @@ class ExpensableApp
     options=["login", "create_user", "exit"]
     puts options.join(" | ")
     until action == "exit"
-        action=login_menu(options)[0]
+
+        action = login_menu(options)[0]
+
         case action
         when "login" then login
         when "create_user" then create_user
@@ -78,23 +80,6 @@ class ExpensableApp
     get_with_options(options)
   end
 
-  # def get_with_options(options)
-  #   action = ""
-  #   id = nil
-  #   loop do
-  #     # puts options.join(" | ")
-  #     print "> "
-  #     action, id = gets.chomp.split(" ")
-  #     # action ||= ""
-  #     # Hacer el request!
-  #     break if options.include?(action)
-  #     puts "Invalid option"
-  #   end
-  #   # action.empty? && default ? [default, id] : [action, id.to_i]
-  #   #  true           nil
-  #   [action, id.to_i]
-  # end
-
   def get_with_options(options)
     action = ""
     id = nil
@@ -121,8 +106,6 @@ class ExpensableApp
         options=["create", "show ID", "update ID", "delete ID", "add-to ID", "toggle", "next","prev", "logout"]
         puts options.join(" | ")
         action, id = categories_menu(options)
-        # p action
-        # p id
         case action
         when "create" then puts "create #{id}"#create_note
         when "show" then show(id)
@@ -143,7 +126,7 @@ class ExpensableApp
       # end
     end
   end
-  
+
   def add_to(id)
   transaction_data=transaction_form
   new_transaction=Services::Sessions.addto(@user[:token],id,transaction_data)
@@ -167,7 +150,6 @@ class ExpensableApp
     table = Terminal::Table.new
     table.title = "#{@type.capitalize}\n #{@today.strftime("%B %Y")}" #format fecha mm-yyyy
     table.headings = ["ID", "Category", "Total"]
-    # table.rows = @categories
     dates_category=@categories.select {|category| category [:transaction_type] == @type }
     table.rows = dates_category.map do |category|
         total_amount = 0
@@ -184,18 +166,23 @@ class ExpensableApp
   end
 
   def get_month_categories
+
     @categories = @categories.map! do |category| #categories actualizado
+
       month=[]
       # category.merge!(day:"aaaa")
       category[:transactions].each do |transaction|
-       date = DateTime.parse(transaction[:date])  #se convierte en fecha
-       init_month = DateTime.new(@today.strftime("%Y").to_i,@today.strftime("%-m").to_i) #primer dia del mes
-       final_month = DateTime.new(@today.next_month.strftime("%Y").to_i,@today.next_month.strftime("%-m").to_i)-1 #ultimo dia de mes
+       date = DateTime.parse(transaction[:date])  #se convierte en fecha 
+       init_month = DateTime.new(@today.strftime("%Y").to_i,@today.strftime("%-m").to_i) #primer dia del mes 
+       final_month = DateTime.new(@today.next_month.strftime("%Y").to_i,@today.next_month.strftime("%-m").to_i)-1 #ultimo dia de mes 
+
        if date < final_month && date > init_month
         month<<transaction
        end
+
+       
       end
-      category.merge(resum:month) #agrega un key adicional "Resum: " y value:mount[] en transactions que almacena el mes completo
+      category.merge(resum:month) #agrega un key adicional "Resum: " y value:mount[] en transactions que almacena el mes completo 
     end
     @categories
   end
@@ -213,6 +200,7 @@ class ExpensableApp
     @transactions = Services::Sessions.indextransactions(@user[:token],id)
     transaction_page(id)
   end
+end
 
   def transaction_page(id_category)
     action = ""
