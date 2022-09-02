@@ -110,8 +110,8 @@ class ExpensableApp
 
         when "create" then create_category
         when "show" then show(id)
-        when "update" then puts "update category"
-        when "delete" then puts "delete category"
+        when "update" then update_category(id)
+        # when "delete" then delete_category(id)
         when "add-to" then add_to(id)
         when "toggle" then toggle_category#create_note
         when "next" then next_category#update_note(id)
@@ -128,6 +128,36 @@ class ExpensableApp
       # end
     end
   end
+
+  def update_category(id)
+    category_data = update_category_form
+    p category_data
+    p @user[:token]
+    p id
+
+    updated_category = Services::Sessions.update(@user[:token], id, category_data)
+
+    found_category = @categories.find { |category| category[:id] == id }
+    found_category.update(updated_category)
+  end
+
+  def update_category_form
+    name = get_string("Name")#, required: true)
+    transaction_type = get_string("Transaction Type")#, required: true)
+   
+    { 
+      name: name,#.empty? "Cannot be blank" : name, 
+      transaction_type: transaction_type#.empty? "Only income or expense" 
+    } #falta poner que si no es income o expense
+  end
+
+  # def delete_category(id)
+  #   deleted_category = Services::Sessions.update(@name[:token], id)
+    
+  #   found_category = @category.find { |category| category[:id] == id }
+  #   # found_category.update(deleted_category)
+  #   @categories.delete(found_category)
+  # end
 
   def add_to(id)
   transaction_data=transaction_form
@@ -172,8 +202,6 @@ class ExpensableApp
     @categories = @categories.map! do |category| #categories actualizado
 
       month=[]
-      # category.merge!(day:"aaaa")
-      p category[:transactions]
       category[:transactions].each do |transaction|
        date = DateTime.parse(transaction[:date])  #se convierte en fecha 
        init_month = DateTime.new(@today.strftime("%Y").to_i,@today.strftime("%-m").to_i) #primer dia del mes 
@@ -208,7 +236,6 @@ end
 
 def create_category
   category_data = category_form
-  p category_data
   new_data = Services::Sessions.create(@user[:token], category_data)
   @categories << new_data
 end
@@ -267,12 +294,11 @@ end
         month<<transaction
        end
       transaction.merge(resum:month) #agrega un key adicional "Resum: " y value:mount[] en transactions que almacena el mes completo
-    end
+  end
     @transactions=@transactions.select {|transaction| transaction[:resum].size>0}
     @transactions
-  end
-
 end
+
 
 app=ExpensableApp.new
 app.start
