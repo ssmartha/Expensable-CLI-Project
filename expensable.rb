@@ -45,6 +45,9 @@ class ExpensableApp
     credentials = credentials_form
     @user = Services::Sessions.login(credentials)
     categories_page
+  rescue HTTParty::ResponseError => error
+    parsed_errorr = JSON.parse(error.message, symbolize_names: true)
+    puts parsed_errorr[:errors]
   end
   def credentials_form
     email = get_string("Email")
@@ -272,7 +275,6 @@ end
     @transactions
   end
 
-end
 
 app=ExpensableApp.new
 app.start
