@@ -264,7 +264,7 @@ end
         case action
         when "add" then puts "add #{id}"#create_note
         when "update" then puts "update transaction #{id}"
-        when "delete" then puts "delete transaction #{id}"
+        when "delete" then delete_transaction(id_category,id)
         when "next" then puts "next transaction #{id}"
         when "prev" then puts "prev transaction #{id}"
         end
@@ -273,6 +273,18 @@ end
       #   puts parsed_error
       # end
     end
+  end
+# self.deletetransaction(token, id_category, id_transaction)
+  # @categories = Services::Sessions.indexcategories(@user[:token])
+  def delete_transaction(id_category, id_transaction)
+    p @user[:token]
+    p id_category
+    p id_transaction
+    delete_transaction=Services::Sessions.destroytransaction(@user[:token], id_category, id_transaction)
+    p delete_transaction
+    transaction_selected=@transactions.find {|transaction| transaction[:id]==id_transaction}
+    p transaction_selected
+    @transactions.delete(transaction_selected)
   end
 
   def transactions_table(id_category)
@@ -300,6 +312,6 @@ end
   end
     @transactions=@transactions.select {|transaction| transaction[:resum].size>0}
     @transactions
-
+end
 app=ExpensableApp.new
 app.start

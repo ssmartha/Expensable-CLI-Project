@@ -105,6 +105,18 @@ module Services
     #   JSON.parse(response.body, symbolize_names: true) unless response.body.nil?
     # end
 
+    def self.destroytransaction(token, id_category, id_transaction)
+      options = {
+        headers: { Authorization: "Token token=#{token}" }
+      }
+      p options
+      response = delete("/categories/#{id_category}/transactions/#{id_transaction}", options)
+      p response
+      # HTTParty::ResponseError
+      raise ResponseError.new(response) unless response.success?
+      JSON.parse(response.body, symbolize_names: true)
+    end
+
   end
 end
 
