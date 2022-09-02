@@ -9,6 +9,7 @@ class ExpensableApp
     @user = nil
     @type = "expense"
     @today = DateTime.parse("2021-09-15")
+    @categories=nil
   end
    def start
     puts welcome_message
@@ -68,8 +69,6 @@ class ExpensableApp
     credentials = user_form
     @user = Services::Sessions.signup(credentials)
     categories_page
-    # notes_pages
-    # p @user
   end
   def user_form
     email = get_string("Email")
@@ -134,10 +133,6 @@ class ExpensableApp
 
   def update_category(id)
     category_data = update_category_form
-    p category_data
-    p @user[:token]
-    p id
-
     updated_category = Services::Sessions.update(@user[:token], id, category_data)
 
     found_category = @categories.find { |category| category[:id] == id }
@@ -254,17 +249,15 @@ end
     until action == "back"
         get_month_transactions
       # begin
-        # puts categories_table
         puts transactions_table(id_category)
         options=["add", "update ID", "delete ID", "next", "prev", "back"]
         puts options.join(" | ")
         action, id = categories_menu(options)
-        # p action
-        # p id
+
         case action
         when "add" then puts "add #{id}"#create_note
         when "update" then puts "update transaction #{id}"
-        when "delete" then puts "delete transaction #{id}"
+        when "delete" then delete_transaction(id_category,id)
         when "next" then puts "next transaction #{id}"
         when "prev" then puts "prev transaction #{id}"
         end
@@ -273,6 +266,13 @@ end
       #   puts parsed_error
       # end
     end
+  end
+# self.deletetransaction(token, id_category, id_transaction)
+  # @categories = Services::Sessions.indexcategories(@user[:token])
+  def delete_transaction(id_category, id_transaction)
+    deleted_transaction=Services::Sessions.destroytransaction(@user[:token], id_category, id_transaction)
+    transaction_selected=@transactions.find {|transaction| transaction[:id]==id_transaction}
+    @transactions.delete(transaction_selected)
   end
 
   def transactions_table(id_category)
@@ -300,6 +300,6 @@ end
   end
     @transactions=@transactions.select {|transaction| transaction[:resum].size>0}
     @transactions
-
+end
 app=ExpensableApp.new
 app.start
