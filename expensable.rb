@@ -107,13 +107,15 @@ class ExpensableApp
         puts options.join(" | ")
         action, id = categories_menu(options)
         case action
-        when "create" then puts "create #{id}"#create_note
+
+        when "create" then create_category
         when "show" then show(id)
         when "update" then puts "update category"
         when "delete" then puts "delete category"
         when "add-to" then add_to(id)
         when "toggle" then toggle_category#create_note
         when "next" then next_category#update_note(id)
+
         when "prev" then prev_category
         when "logout"
           puts welcome_message
@@ -171,6 +173,7 @@ class ExpensableApp
 
       month=[]
       # category.merge!(day:"aaaa")
+      p category[:transactions]
       category[:transactions].each do |transaction|
        date = DateTime.parse(transaction[:date])  #se convierte en fecha 
        init_month = DateTime.new(@today.strftime("%Y").to_i,@today.strftime("%-m").to_i) #primer dia del mes 
@@ -201,6 +204,20 @@ class ExpensableApp
     transaction_page(id)
   end
 end
+
+
+def create_category
+  category_data = category_form
+  p category_data
+  new_data = Services::Sessions.create(@user[:token], category_data)
+  @categories << new_data
+end
+def category_form
+  name = get_string("Name")
+  transaction_type = get_string("Transaction Type")
+  { name: name, transaction_type: transaction_type, color: "red", icon: "bank", transaction: [] }
+end
+
 
   def transaction_page(id_category)
     action = ""
@@ -256,5 +273,6 @@ end
   end
 
 end
+
 app=ExpensableApp.new
 app.start
