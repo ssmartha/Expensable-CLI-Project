@@ -47,6 +47,20 @@ module Services
       JSON.parse(response.body, symbolize_names: true)
     end
 
+    def self.create(token, category_data)
+      options = {
+        body: category_data.to_json,
+        headers: { Authorization: "Token token=#{token}",
+        "Content-Type": "application/json"
+        }
+      }
+
+      response = post("/categories", options)
+      # HTTParty::ResponseError
+      # raise ResponseError.new(response) unless response.success?
+      JSON.parse(response.body, symbolize_names: true)
+    end
+
   end
 end
 
